@@ -1,0 +1,185 @@
+/* 
+HOW TO USE:
+
+Add 
+`#include "<ANYBODY_PATH_TOOLBOX>/Rotations/InstantaneousAxisOfRotation.any"`
+at the top of your main file. 
+
+Then add the `InstantaneousAxisOfRotation` class in one of your studies. 
+
+
+EXAMPLE:
+```
+#include "<ANYBODY_PATH_TOOLBOX>/Rotations/InstantaneousAxisOfRotation.any"
+
+Main = {
+
+
+  // This is a simple example of using the InstantaneousAxisOfRotation class
+  // to the calculate and vizualize the instantaneous axis of rotation 
+  // between Body1 and Body2
+  InstantaneousAxisOfRotation IAOR (AnyRefFrame& Body1, AnyRefFrame& Body2) = 
+  {
+      // The sphere drawn at the mid point of the vizualized axis.
+      #var AnyVar SphereSize=0.02;
+      
+      // The length of the vizualized axis
+      #var AnyVar AxisLength=2;
+  
+      // The line thickness of the vizualized axis.
+      #var AnyVar LineThickness = 0.005;       
+
+   };
+```
+
+The object will IAOR object will plot the axis, and provide the following outputs:
+
+|-----------------------|--------------|------------------------------------------------|
+| Output variable       | Type         | Desciption                                     |
+|-----------------------|--------------|------------------------------------------------|
+| RotationAxisDirections| AnyVec3      | The mid point on axis in Body1 coordinates     |
+| RotationMagnitude     | AnyVec3      | The direction of the axis in Body1 coordinates |
+| rc_2                  | AnyVec3      | Point on axis closest to Body2                 |
+| rc_1                  | AnyVec3      | Point on axis closest to Body1                 |
+| MotionPitch           | AnyVar       | The ratio of linear motion to angular motion   |
+| rc_dot                | AnyVec3      | The linear velocity along the axis of rotation |
+| omega                 | AnyVec3      | Anuglar velocity vector of Body2 wrt. Body1    |
+| r                     | AnyVec3      | Position of Body2 wrt. Body1                   |
+| r_dot                 | AnyVec3      | Linear velocity of Body2 wrt. Body1            |
+|-----------------------|--------------|------------------------------------------------| 
+
+*/
+
+
+
+#class_template InstantaneousAxisOfRotation (
+   AnyRefFrame& Body1,
+   AnyRefFrame& Body2,
+   SHOW_LINEAR_VELOCITY = "On",
+   AXIS_LOCATION = "MIDPOINT",
+   SHOW_SHORTEST_DIST = "On"
+){
+  
+  #var AnyVar SphereSize=0.02;
+  #var AnyVar AxisLength=2;
+  #var AnyVar AxisThickness = 0.01;
+  
+     
+     /// Rotational Velocity of Body2 with repect to Body1
+     AnyVec3 omega = Rotational.Vel;
+     
+     /// Linear Velociy of Body2 with respect to Body1
+     AnyVec3 r_dot = Linear.Vel; 
+     
+     /// Postion of Body2 with respect to Body1
+     AnyVec3 r = Linear.Pos;
+     
+     /// The rotation magnitude 
+     AnyVar RotationMagnitude = iffun(eqfun(vnorm(omega),0),1e-15, vnorm(omega));
+     
+     /// The rotation axis direction 
+     AnyVec3 RotationAxisDirection = omega/RotationMagnitude;
+     
+     /// The point on the rotation axis closest to Body2
+     AnyVec3 rc_2 = r + cross(omega, r_dot)/(RotationMagnitude^2);
+     
+     /// The point on the rotation axis closest to Body1
+     AnyVec3 rc_1 = rc_2-rc_2*RotationAxisDirection'*RotationAxisDirection;
+     
+     /// The motion pitch or the ratio of linear motion to angular motion
+     AnyVar MotionPitch = (omega*r_dot')/(RotationMagnitude^2);
+     
+     /// Linear Velocity of points on the rotation axis
+     AnyVec3 rc_dot = MotionPitch*omega;
+          
+     AnyFolder Visualizations = 
+     {
+      // Draw the points on the axis closest to the objects
+      #if SHOW_SHORTEST_DIST == "On"
+      AnyDrawSphere p2={
+        Opacity = 0.5;
+        ScaleXYZ=..SphereSize*{1,1,1};
+        Position= ..Body1.r+..rc_2*..Body1.Axes';
+      };
+      AnyDrawLine DrawShortesDistance2 ={
+        AnyRefFrame &ref = ..Body1;
+        p0 = ..r;
+        p1 = ..rc_2;
+        Opacity = 0.2;
+        Line.Thickness = 0.003;
+        Line.RGB={0,0,0};
+        GlobalCoord  = Off;
+      };        
+      
+      AnyDrawSphere p1={
+        Opacity = 0.5;
+        ScaleXYZ=..SphereSize*{1,1,1};
+        Position= ..Body1.r+..rc_1*..Body1.Axes';
+      };
+      AnyDrawLine DrawShortesDistance1 ={
+        AnyRefFrame &ref = ..Body1;
+        p0 = {0,0,0};
+        p1 = ..rc_1;
+        Opacity = 0.2;
+        Line.Thickness = 0.003;
+        Line.RGB={0,0,0};
+        GlobalCoord  = Off;
+      };        
+      
+      AnyDrawSphere pmid={
+        Opacity = 0.5;
+        ScaleXYZ=..SphereSize*{1,1,1};
+        Position= ..Body1.r+0.5*(..rc_1+..rc_2)*..Body1.Axes';
+        RGB = {0,0,1};
+      };
+      #endif
+     
+      // Draw the instant rotation axis
+      AnyDrawLine DrawRotationAxisLine ={
+       #if AXIS_LOCATION == "MIDPOINT"
+       AnyVec3 P =  0.5*(..rc_1+..rc_2);
+       #endif
+       #if AXIS_LOCATION == "BODY1"
+       AnyVec3 P =  ..rc_1;
+       #endif
+       #if AXIS_LOCATION == "BODY1"
+       AnyVec3 P =  ..rc_2;
+       #endif
+       
+       AnyRefFrame &ref = ..Body1;
+       Opacity = 0.4;
+       p0 = P-0.5*..RotationAxisDirection*..AxisLength;
+       p1 = P+0.5*..RotationAxisDirection*..AxisLength;
+       Line.Thickness=..AxisThickness;
+       Line.RGB={0,0,1};
+       GlobalCoord =Off;
+     };
+     
+
+     #if SHOW_LINEAR_VELOCITY == "On"
+     AnyDrawLine DrawLinearVelocityVector ={
+       AnyRefFrame &ref = ..Body1;
+       p0 = ..rc_2;
+       p1 = p0+..rc_dot;
+       Opacity = 0.7;
+       Line.End.Style = Line3DCapStyleArrow;
+       Line.Thickness=..AxisThickness*1.1;
+       Line.RGB={1,0,0};
+       GlobalCoord =Off;
+     };
+     #endif
+   };
+   AnyKinLinear Linear ={
+     Ref=0;
+     AnyRefFrame  &Body1= .Body1;
+     AnyRefFrame  &Body2= .Body2;
+   };
+   
+   AnyKinRotational Rotational ={
+     Type = RotVector;
+     AngVelOnOff = On;
+     AnyRefFrame  &Body1= .Body1;
+     AnyRefFrame  &Body2= .Body2;
+   };   
+  
+};
