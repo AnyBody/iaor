@@ -57,40 +57,58 @@ The object will IAOR object will plot the axis, and provide the following output
    AnyRefFrame& Body2,
    SHOW_LINEAR_VELOCITY = "On",
    AXIS_LOCATION = "MIDPOINT",
-   SHOW_SHORTEST_DIST = "On"
-){
+   SHOW_SHORTEST_DIST = "On")
+{
   
+  AnyKinLinear Linear ={
+    Ref=0;
+    AnyRefFrame  &Body1= .Body1;
+    AnyRefFrame  &Body2= .Body2;
+  };
+  
+  AnyKinRotational Rotational ={
+    Type = RotVector;
+    AngVelOnOff = On;
+    AnyRefFrame  &Body1= .Body1;
+    AnyRefFrame  &Body2= .Body2;
+  };  
+   
+  /// Size of the drawn spheres
   #var AnyVar SphereSize=0.02;
+  
+  /// Length of the axis drawn
   #var AnyVar AxisLength=2;
+  
+  /// Thickness of the axis drawn
   #var AnyVar AxisThickness = 0.01;
   
      
-     /// Rotational Velocity of Body2 with repect to Body1
-     AnyVec3 omega = Rotational.Vel;
-     
-     /// Linear Velociy of Body2 with respect to Body1
-     AnyVec3 r_dot = Linear.Vel; 
-     
-     /// Postion of Body2 with respect to Body1
-     AnyVec3 r = Linear.Pos;
-     
-     /// The rotation magnitude 
-     AnyVar RotationMagnitude = iffun(eqfun(vnorm(omega),0),1e-15, vnorm(omega));
-     
-     /// The rotation axis direction 
-     AnyVec3 RotationAxisDirection = omega/RotationMagnitude;
-     
-     /// The point on the rotation axis closest to Body2
-     AnyVec3 rc_2 = r + cross(omega, r_dot)/(RotationMagnitude^2);
-     
-     /// The point on the rotation axis closest to Body1
-     AnyVec3 rc_1 = rc_2-rc_2*RotationAxisDirection'*RotationAxisDirection;
-     
-     /// The motion pitch or the ratio of linear motion to angular motion
-     AnyVar MotionPitch = (omega*r_dot')/(RotationMagnitude^2);
-     
-     /// Linear Velocity of points on the rotation axis
-     AnyVec3 rc_dot = MotionPitch*omega;
+  /// Rotational Velocity of Body2 with repect to Body1
+  AnyVec3 omega = Rotational.Vel;
+  
+  /// Linear Velociy of Body2 with respect to Body1
+  AnyVec3 r_dot = Linear.Vel; 
+  
+  /// Postion of Body2 with respect to Body1
+  AnyVec3 r = Linear.Pos;
+  
+  /// The rotation magnitude 
+  AnyVar RotationMagnitude = iffun(eqfun(vnorm(omega),0),1e-15, vnorm(omega));
+  
+  /// The rotation axis direction 
+  AnyVec3 RotationAxisDirection = omega/RotationMagnitude;
+  
+  /// The point on the rotation axis closest to Body2
+  AnyVec3 rc_2 = r + cross(omega, r_dot)/(RotationMagnitude^2);
+  
+  /// The point on the rotation axis closest to Body1
+  AnyVec3 rc_1 = rc_2-rc_2*RotationAxisDirection'*RotationAxisDirection;
+  
+  /// The motion pitch or the ratio of linear motion to angular motion
+  AnyVar MotionPitch = (omega*r_dot')/(RotationMagnitude^2);
+  
+  /// Linear Velocity of points on the rotation axis
+  AnyVec3 rc_dot = MotionPitch*omega;
           
      AnyFolder Visualizations = 
      {
@@ -169,17 +187,6 @@ The object will IAOR object will plot the axis, and provide the following output
      };
      #endif
    };
-   AnyKinLinear Linear ={
-     Ref=0;
-     AnyRefFrame  &Body1= .Body1;
-     AnyRefFrame  &Body2= .Body2;
-   };
-   
-   AnyKinRotational Rotational ={
-     Type = RotVector;
-     AngVelOnOff = On;
-     AnyRefFrame  &Body1= .Body1;
-     AnyRefFrame  &Body2= .Body2;
-   };   
+ 
   
 };
