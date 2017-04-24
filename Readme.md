@@ -1,8 +1,10 @@
 # Class for calculating Instantaneous Axis of Rotation
 
-We have created a custom class_template that makes it easy to add all this code to a model and display the instantaneous axis of rotation. Here is a short example on how to use the class. 
+We have created a custom class_template that makes it easy to calculate and display the intantaneous axis of rotation between two bodies in an AnyBody Model.
 
-First add the following to the top of your main file.
+![Rolling without slipping](iaor_ball.gif)
+
+Here is a short example on how to use the class. First add the following to the top of your main file.
 
 ```c++
 #include "<ANYBODY_PATH_TOOLBOX>/Rotations/InstantaneousAxisOfRotation.any"
