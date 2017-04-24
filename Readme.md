@@ -39,16 +39,14 @@ Main = {
 
 The object will IAOR object will plot the axis, and provide the following outputs:
 
-|-----------------------|--------------|------------------------------------------------|
-| Output variable       | Type         | Desciption                                     |
-|:----------------------|--------------|:-----------------------------------------------|
-| RotationAxisDirections| AnyVec3      | The mid point on axis in Body1 coordinates     |
-| RotationMagnitude     | AnyVec3      | The direction of the axis in Body1 coordinates |
-| rc_2                  | AnyVec3      | Point on axis closest to Body2                 |
-| rc_1                  | AnyVec3      | Point on axis closest to Body1                 |
-| MotionPitch           | AnyVar       | The ratio of linear motion to angular motion   |
-| rc_dot                | AnyVec3      | The linear velocity along the axis of rotation |
-| omega                 | AnyVec3      | Anuglar velocity vector of Body2 wrt. Body1    |
-| r                     | AnyVec3      | Position of Body2 wrt. Body1                   |
-| r_dot                 | AnyVec3      | Linear velocity of Body2 wrt. Body1            |
-|-----------------------|--------------|------------------------------------------------| 
+| Output variable       | Type       | Desciption                                     |
+|:----------------------|------------|:-----------------------------------------------|
+| RotationAxisDirections| `AnyVec3`  | The mid point on axis in Body1 coordinates     |
+| RotationMagnitude     | `AnyVec3`  | The direction of the axis in Body1 coordinates |
+| rc_2                  | `AnyVec3`  | Point on axis closest to Body2                 |
+| rc_1                  | `AnyVec3`  | Point on axis closest to Body1                 |
+| MotionPitch           | `AnyVar`   | The ratio of linear motion to angular motion   |
+| rc_dot                | `AnyVec3`  | The linear velocity along the axis of rotation |
+| omega                 | `AnyVec3`  | Anuglar velocity vector of Body2 wrt. Body1    |
+| r                     | `AnyVec3`  | Position of Body2 wrt. Body1                   |
+| r_dot                 | `AnyVec3`  | Linear velocity of Body2 wrt. Body1            |
