@@ -1,0 +1,51 @@
+#include "InstantaneousAxisOfRotation.any"
+
+Main = {
+  
+  AnyFolder Model ={  
+    AnyFixedRefFrame Frame  ={      AnyDrawRefFrame drw={};     };
+    
+    AnySeg Object1 ={      Mass=1;      Jii={0,0,0};    };
+    
+    AnyStdJoint StdJoint = {
+      AnyFixedRefFrame &ref1=.Frame;
+      AnySeg &ref2=.Object1;
+    };    
+    
+    AnySeg Object2 ={      Mass=1;      Jii={0,0,0};      AnyDrawRefFrame drw={};    };
+    
+    AnyKinLinear lin ={
+      AnyFixedRefFrame &ref1=.Frame;
+      AnySeg &ref2=.Object2;
+    };
+    
+    AnyKinRotational rot ={
+      AnyFixedRefFrame &ref1=.Frame;
+      AnySeg &ref2=.Object2;
+      Type =RotAxesAngles;
+    };
+    
+    AnyKinEqInterPolDriver  Lindrv ={
+      Type =Bspline;
+      AnyKinLinear &ref=.lin;  
+      T={0,0.25,0.5,1};
+      Data={1*{0,0.5,0.75,1},1*{0,0.5,0.75,1},1*{0,0.5,0.75,1}};
+    };
+      
+    AnyKinEqInterPolDriver  rotdrv ={
+      AnyKinRotational &ref=.rot;
+      Type =Bspline;
+      T={0,0.25,0.5,1};
+      Data=1*{0*{0,0.5,0.75,1},2*{0,0.5,0.75,1},10*{0,0.5,0.75,1}};
+      //Data=1*{0*{0,0.5,0.75,1},0*{0,0.5,0.75,1},10*{0,0.5,0.75,1}};
+    };
+      
+   InstantaneousAxisOfRotation IAOR (Body1=.Object1, Body2=.Object2) ={};
+  };
+  
+  AnyBodyStudy study ={
+    AnyFolder &ref=.Model;
+    Gravity ={0,0,-9.81};
+    tEnd=0.99;
+  };
+};

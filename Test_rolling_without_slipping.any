@@ -1,0 +1,120 @@
+ // Todo: Write a small description of your model here
+
+#include "InstantaneousAxisOfRotation.any"
+ 
+Main = {
+  
+  // The actual body model goes in this folder
+  AnyFolder MyModel = {
+    
+    // Global Reference Frame
+    AnyFixedRefFrame GlobalRef = {
+      
+      AnyDrawRefFrame drw={};
+      
+    };  // Global reference frame
+    
+    
+    AnyFolder Segments = {
+      
+      
+
+
+      
+      AnySeg Ground =       {
+        
+        Mass = 0;
+        Jii = {0, 0, 0};
+
+ AnyRefNode jnt ={ARel = RotMat(0.3*pi,y)*RotMat(0.3*pi,x);};        
+        
+                AnyDrawRefFrame drw1 ={ RGB={0,0,1};};
+      };
+
+      
+      AnySeg Ball =       {
+        
+        Mass = 0;
+        Jii = {0, 0, 0};
+        AnyDrawRefFrame drw1 ={ RGB={0,0,1};};
+        AnyDrawSphere drw2={ScaleXYZ={1,1,1}*0.5;};
+      
+      };
+      
+    };
+    
+    
+    
+    
+    AnyFolder Joints = {
+      
+      
+     AnyKinLinear  Lin1 ={
+        
+        AnyRefFrame &ref1=..GlobalRef;
+        AnyRefFrame &ref2=..Segments.Ground;
+        
+       
+      };
+      
+      AnyKinRotational  Rot1 ={
+        
+        AnyRefFrame &ref1=..GlobalRef;
+        AnyRefFrame &ref2=..Segments.Ground;
+        Type=RotAxesAngles;
+      };
+      
+      
+      AnyKinEqSimpleDriver drv1={
+        AnyKinMeasure &ref1=.Lin1;
+        AnyKinMeasure &ref2=.Rot1;
+        DriverPos ={0,0,0,0,0.25*pi,0};
+        DriverVel ={0,0,0,0,0,0};
+        
+      };
+      
+      AnyKinLinear  Lin2 ={
+        Ref=0;
+        AnyRefFrame &ref1=..Segments.Ground.jnt;
+        AnyRefFrame &ref2=..Segments.Ball;
+      };
+      
+      AnyKinRotational  Rot2 ={
+        
+        AnyRefFrame &ref1=..Segments.Ground.jnt;
+        AnyRefFrame &ref2=..Segments.Ball;
+        Type=RotAxesAngles;
+      };
+      
+      
+      AnyKinEqSimpleDriver drv2={
+        AnyKinMeasure &ref1=.Lin2;
+        AnyKinMeasure &ref2=.Rot2;
+        AnyVar  Radius =0.5;
+        DriverPos ={0,0.5,0,0,0,0};
+        DriverVel ={2*pi*Radius,0,0,-2*pi,0,0};
+        
+      };
+      
+    };
+    
+    
+//    AnyFolder InstantenousAxisCal ={
+   InstantaneousAxisOfRotation IAOR (Body1=.Segments.Ground, Body2=.Segments.Ball) =
+   {
+   AxisThickness = 0.05;
+   
+   };
+  }; // MyModel
+  
+  // The study: Operations to be performed on the model
+  AnyBodyStudy MyStudy = {
+    AnyFolder &Model = .MyModel;
+    Gravity = {0.0, -9.81, 0.0};
+    nStep = 200;
+    tStart = 0;
+    tEnd = 2;
+  };
+  
+};
+
