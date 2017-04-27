@@ -1,8 +1,11 @@
 # Class for calculating Instantaneous Axis of Rotation
 
-We have created a custom class_template that makes it easy to calculate and display the intantaneous axis of rotation between two bodies in an AnyBody Model.
+This is a custom class_template that makes it easy to calculate and display the
+intantaneous axis of rotation between two bodies in an AnyBody Model.
 
 ![Rolling without slipping](iaor_ball.gif)
+
+You can read more about the code in [this blog post](https://anyscript.org/tools/instantaneous-axis-of-rotation/) on AnyScript.org
 
 Here is a short example on how to use the class. First add the following to the top of your main file.
 
